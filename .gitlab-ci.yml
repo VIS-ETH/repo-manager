@@ -1,0 +1,40 @@
+stages:
+  #- test
+  - build
+  - run
+
+.prepare_alpine: &prepare_alpine
+  - apk add npm
+  - npm install -g yarn
+  - yarn
+
+"Build the CLI binary":
+  stage: build
+  tags: [kata]
+  image: alpine:3.24
+  before_script:
+    - *prepare_alpine
+  script:
+    - yarn build
+  artifacts:
+    paths:
+      - dist
+
+"Run the mirror sync job":
+  stage: run
+  tags: [kata]
+  environment: mirroring-prod
+  image: alpine:3.24
+  before_script:
+    - *prepare_alpine
+  script:
+    - export MIRROR_MANAGER_SELF_PROJECT_ID="$CI_PROJECT_ID"
+    - export MIRROR_MANAGER_KEYS_NAME="ETH GitLab Mirroring (Mirror Manager)"
+    - export TARGET_SELF_ROTATION_TOKEN_VARIABLE="GITLAB_TOKEN"
+    - export GITLAB_HOST=https://gitlab.ethz.ch
+    - node ./bin/run.js repos sync-mirror-setups
+  needs:
+    - job: "Build the CLI binary"
+      artifacts: true
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

@@ -1,16 +1,43 @@
 {
   "name": "mirror-manager",
-  "description": "Manage mirroring repositories from GitLab to GitHub",
   "version": "0.0.0",
+  "description": "Manage mirroring repositories from GitLab to GitHub",
+  "keywords": [
+    "oclif"
+  ],
   "author": "Jacques Hoffmann",
   "bin": {
     "mirror-manager": "./bin/run.js"
   },
-  "bugs": "https://github.com/sip-vis-cit-apps/mirror-manager/issues",
+  "files": [
+    "./bin",
+    "./dist",
+    "./oclif.manifest.json"
+  ],
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "yarn typegen && shx rm -rf dist && tsc -b",
+    "lint": "eslint",
+    "postpack": "shx rm -f oclif.manifest.json",
+    "posttest": "yarn lint",
+    "prepack": "oclif manifest && oclif readme",
+    "test": "yarn typegen && mocha --forbid-only \"test/**/*.test.ts\"",
+    "version": "oclif readme && git add README.md",
+    "typegen": "tsx compile_schema.ts"
+  },
   "dependencies": {
+    "@gitbeaker/rest": "^43.8.0",
     "@oclif/core": "^4",
     "@oclif/plugin-help": "^6",
-    "@oclif/plugin-plugins": "^5"
+    "@oclif/plugin-plugins": "^5",
+    "@octokit/auth-oauth-app": "^9.0.3",
+    "ajv": "^8.20.0",
+    "date-fns": "^4.4.0",
+    "js-yaml": "^5.5.0",
+    "json-schema-to-typescript": "^16.0.0",
+    "octokit": "^5.0.5"
   },
   "devDependencies": {
     "@eslint/compat": "^1",
@@ -25,29 +52,16 @@
     "eslint-config-prettier": "^10",
     "mocha": "^11",
     "oclif": "^4",
+    "prettier": "^3.9.5",
     "shx": "^0.3.3",
     "ts-node": "^10",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   },
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "files": [
-    "./bin",
-    "./dist",
-    "./oclif.manifest.json"
-  ],
-  "homepage": "https://github.com/sip-vis-cit-apps/mirror-manager",
-  "keywords": [
-    "oclif"
-  ],
-  "license": "GNU v3",
-  "main": "dist/index.js",
-  "type": "module",
   "oclif": {
     "bin": "mirror-manager",
-    "dirname": "mirror-manager",
     "commands": "./dist/commands",
+    "dirname": "mirror-manager",
     "plugins": [
       "@oclif/plugin-help",
       "@oclif/plugin-plugins"
@@ -59,15 +73,7 @@
       }
     }
   },
-  "repository": "sip-vis-cit-apps/mirror-manager",
-  "scripts": {
-    "build": "shx rm -rf dist && tsc -b",
-    "lint": "eslint",
-    "postpack": "shx rm -f oclif.manifest.json",
-    "posttest": "yarn lint",
-    "prepack": "oclif manifest && oclif readme",
-    "test": "mocha --forbid-only \"test/**/*.test.ts\"",
-    "version": "oclif readme && git add README.md"
-  },
-  "types": "dist/index.d.ts"
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }

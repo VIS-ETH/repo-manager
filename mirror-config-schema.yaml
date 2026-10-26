@@ -1,0 +1,73 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+title: Mirroring Config (Nested Groups)
+description: >
+  Recursive group/subgroup/project tree for repository mirroring configuration.
+type: object
+required:
+  - mirroringConfig
+properties:
+  mirroringConfig:
+    type: object
+    required:
+      - groups
+      - githubKnownHostKeys
+    properties:
+      groups:
+        type: array
+        items:
+          $ref: "#/definitions/group"
+      githubKnownHostKeys:
+        type: array
+        items:
+          type: string
+    additionalProperties: false
+additionalProperties: false
+
+definitions:
+  group:
+    type: object
+    description: A group or subgroup; may contain nested groups and/or projects.
+    required:
+      - name
+    properties:
+      name:
+        type: string
+        minLength: 1
+      groups:
+        type: array
+        items:
+          $ref: "#/definitions/group"
+      projects:
+        type: array
+        items:
+          $ref: "#/definitions/project"
+    additionalProperties: false
+
+  project:
+    type: object
+    required:
+      - name
+      - githubTargetRepo
+    properties:
+      name:
+        type: string
+        minLength: 1
+      githubTargetRepo:
+        $ref: "#/definitions/githubTargetRepo"
+    additionalProperties: false
+
+  githubTargetRepo:
+    type: object
+    required:
+      - name
+      - visibility
+    properties:
+      name:
+        type: string
+        minLength: 1
+      visibility:
+        type: string
+        enum:
+          - public
+          - private
+    additionalProperties: false
